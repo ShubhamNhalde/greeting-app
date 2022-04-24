@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 
@@ -20,17 +22,17 @@ public class GreetingController {
 
     @GetMapping("/getGreeting")
     public Greeting greeting(@RequestParam(value = "name", defaultValue = "World") String name) {
-        return new Greeting(String.format(template, name));
+        return new Greeting((int) counter.incrementAndGet(), String.format(template, name));
     }
 
     @PostMapping("/postGreeting")
     public Greeting sayHello(@RequestBody Greeting greeting) {
-        return new Greeting(String.format(template, greeting.getContent()));
+        return new Greeting((int) counter.incrementAndGet(), String.format(template, greeting.getContent()));
     }
 
     @PutMapping("/putMapping/{counter}")
-    public Greeting sayHello(@PathVariable long counter, @RequestParam(value = "content") String content) {
-        return new Greeting(String.format(template, content));
+    public Greeting sayHello(@PathVariable int counter, @RequestParam(value = "content") String content) {
+        return new Greeting(counter, String.format(template, content));
     }
 
     @GetMapping("/getMessage")
@@ -56,5 +58,10 @@ public class GreetingController {
     @GetMapping("/findGreeting")
     public ResponseEntity<String> findGreeting(@RequestParam Integer id) {
         return new ResponseEntity<String>(greetingService.getData(id), HttpStatus.OK);
+    }
+
+    @GetMapping("/findAllGreeting")
+    public ResponseEntity<List<Greeting>> findAllGreeting() {
+        return new ResponseEntity<List<Greeting>>(greetingService.getAllData(), HttpStatus.OK);
     }
 }
